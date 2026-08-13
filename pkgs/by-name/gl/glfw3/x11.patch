@@ -1,11 +1,14 @@
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index a0be580e..ba143851 100644
+Fix linkage issues on X11 (https://github.com/NixOS/nixpkgs/issues/142583).
+
+GLFW dynamically loads X11 libraries. On Nix they are not on the default
+search path, so link them so they appear in DT_NEEDED.
+
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -219,6 +219,16 @@ if (GLFW_BUILD_X11)
-     if (NOT X11_Xshape_INCLUDE_PATH)
+@@ -211,6 +211,16 @@
          message(FATAL_ERROR "X Shape headers not found; install libxext development package")
      endif()
+     target_include_directories(glfw PRIVATE "${X11_Xshape_INCLUDE_PATH}")
 +
 +    target_link_libraries(glfw PRIVATE ${X11_Xrandr_LIB}
 +                                       ${X11_Xinerama_LIB}

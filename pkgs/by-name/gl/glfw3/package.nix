@@ -22,13 +22,7 @@
   withMinecraftPatch ? false,
 }:
 let
-  version = "3.4";
-  minecraftPatches = fetchFromGitHub {
-    owner = "BoyOrigin";
-    repo = "glfw-wayland";
-    rev = "f62b4ae8f93149fd754cadecd51d8b1a07d20522";
-    hash = "sha256-kvWP34rOD4HSTvnKb33nvVquTGZoqP8/l+8XQ0h3b7Y=";
-  };
+  version = "3.5.1";
 in
 stdenv.mkDerivation {
   pname = "glfw${lib.optionalString withMinecraftPatch "-minecraft"}";
@@ -43,14 +37,23 @@ stdenv.mkDerivation {
     owner = "glfw";
     repo = "GLFW";
     rev = version;
-    hash = "sha256-FcnQPDeNHgov1Z07gjFze0VMz2diOrpbKZCsI96ngz0=";
+    hash = "sha256-Vwi7MbzrQmcsENez987/Ju7H0pz0tSV6YC0DqwGeQ+w=";
   };
 
   # Fix linkage issues on X11 (https://github.com/NixOS/nixpkgs/issues/142583)
-  patches = [ ./x11.patch ] ++ (lib.optional withMinecraftPatch ./window-position.patch);
-  prePatch = lib.optionalString withMinecraftPatch ''
-    patches+=(${minecraftPatches}/patches/*.patch)
-  '';
+  # Minecraft patches: Wayland workarounds for LWJGL, originally from
+  # BoyOrigin/glfw-wayland (3.4). Duplicate-scroll (0002) was fixed upstream
+  # in 3.5; the rest are maintained here against 3.5.1.
+  patches = [
+    ./x11.patch
+  ]
+  ++ lib.optionals withMinecraftPatch [
+    ./window-position.patch
+    ./key-modifiers.patch
+    ./set-cursor-pos.patch
+    ./window-size-callback.patch
+    ./window-icon.patch
+  ];
 
   propagatedBuildInputs = lib.optionals (!stdenv.hostPlatform.isWindows) [ libGL ];
 
