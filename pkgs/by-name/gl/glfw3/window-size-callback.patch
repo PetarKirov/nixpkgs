@@ -1,0 +1,16 @@
+Fire the window size callback when leaving fullscreen on Wayland.
+
+Otherwise clients such as Minecraft keep the old fullscreen size cached.
+Originally BoyOrigin/glfw-wayland patch 0004.
+
+--- a/src/wl_window.c
++++ b/src/wl_window.c
+@@ -2574,6 +2574,8 @@ void _glfwSetWindowSizeWayland(_GLFWwindow* window, int width, int height)
+             libdecor_state_free(frameState);
+         }
+ 
++        _glfwInputWindowSize(window, width, height);
++
+         if (window->wl.visible)
+             _glfwInputWindowDamage(window);
+     }

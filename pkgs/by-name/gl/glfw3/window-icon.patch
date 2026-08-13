@@ -1,0 +1,18 @@
+Do not treat an unsupported window-icon request as a hard GLFW error.
+
+Older Minecraft / LWJGL3 versions abort on GLFW_FEATURE_UNAVAILABLE at
+startup. Originally BoyOrigin/glfw-wayland patch 0005.
+
+--- a/src/wl_window.c
++++ b/src/wl_window.c
+@@ -2525,8 +2525,8 @@ void _glfwSetWindowTitleWayland(_GLFWwindow* window, const char* title)
+ void _glfwSetWindowIconWayland(_GLFWwindow* window,
+                                int count, const GLFWimage* images)
+ {
+-    _glfwInputError(GLFW_FEATURE_UNAVAILABLE,
+-                    "Wayland: The platform does not support setting the window icon");
++    fprintf(stderr,
++            "[GLFW] Wayland: The platform does not support setting the window icon\n");
+ }
+ 
+ void _glfwGetWindowPosWayland(_GLFWwindow* window, int* xpos, int* ypos)
